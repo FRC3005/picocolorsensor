@@ -163,16 +163,16 @@ int main()
     gpio_set_function(PICO_DEFAULT_UART_RX_PIN, GPIO_FUNC_UART);
 
     // Init I2c 0
-    i2c_init(i2c0, 400000);
-    gpio_set_function(PICO_DEFAULT_I2C_SDA_PIN, GPIO_FUNC_I2C);
-    gpio_set_function(PICO_DEFAULT_I2C_SCL_PIN, GPIO_FUNC_I2C);
+    i2c_init(i2c0, 100000);
+    gpio_set_function(21, GPIO_FUNC_I2C);
+    gpio_set_function(22, GPIO_FUNC_I2C);
     gpio_pull_up(PICO_DEFAULT_I2C_SDA_PIN);
     gpio_pull_up(PICO_DEFAULT_I2C_SCL_PIN);
 
     // Init I2c 1
-    i2c_init(i2c1, 400000);
-    gpio_set_function(6, GPIO_FUNC_I2C);
-    gpio_set_function(7, GPIO_FUNC_I2C);
+    i2c_init(i2c1, 100000);
+    gpio_set_function(19, GPIO_FUNC_I2C);
+    gpio_set_function(20, GPIO_FUNC_I2C);
     gpio_pull_up(6);
     gpio_pull_up(7);
 
@@ -186,7 +186,7 @@ int main()
     gpio_set_dir(15, GPIO_OUT);
     gpio_put(15, 1);
 
-    char outputBuffer[512];
+    char outputBuffer[1024];
 
     unsigned int values[10];
     uint8_t i2cBuffer[20];
@@ -243,8 +243,16 @@ int main()
             }
         }
 
-        snprintf(outputBuffer, sizeof(outputBuffer), "%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u\n",
-                 currentValid0, currentValid1, values[0], values[1], values[2], values[3], values[4], values[5], values[6], values[7], values[8], values[9]);
+        uint32_t checksum = (currentValid0 ? 1 : 0) + (currentValid1 ? 1 : 0);
+        for (int i = 0; i < 10; i++)
+        {
+            checksum += values[i];
+        }
+
+        snprintf(outputBuffer, sizeof(outputBuffer), "%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u,%u\n",
+                 currentValid0, currentValid1, values[0], values[1], values[2], values[3],
+                 values[4], values[5], values[6], values[7], values[8], values[9],
+                 checksum);
 
         uart_puts(uart0, outputBuffer);
 

@@ -152,6 +152,7 @@ public class PicoColorSensor implements AutoCloseable {
       color1.blue = parseIntFromIndex(charSeq, read, lastComma);
       color1.ir = parseIntFromIndex(charSeq, read, lastComma);
       int prox1 = parseIntFromIndex(charSeq, read, lastComma);
+      int checksum = parseIntFromIndex(charSeq, read, lastComma);
 
       double ts = Timer.getFPGATimestamp();
 
